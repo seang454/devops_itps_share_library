@@ -11,7 +11,7 @@ COPY src ./src
 # Build the project (skip tests)
 RUN gradle build -x test
 
-# Stage 2: Runtime with OpenJDK
+# Stage 2: Runtime with an OpenJDK
 FROM openjdk:17-jdk-slim 
 ARG PORT=8080
 ENV PORT=${PORT}
