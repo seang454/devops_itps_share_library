@@ -1,31 +1,39 @@
+# ===============================
 # Stage 1: Build with Gradle
+# ===============================
 ARG GRADLE_VERSION=7.6
 FROM gradle:${GRADLE_VERSION} AS builder
+
 WORKDIR /app
 
-# Copy only necessary files for build
-COPY build.gradle ./build.gradle
-COPY settings.gradle ./settings.gradle
+# Copy Gradle files first (better layer caching)
+COPY build.gradle settings.gradle ./
+
+# Copy source code
 COPY src ./src
 
-# Build the project (skip tests)
-RUN gradle build -x test
+# Build the application (skip tests for CI speed)
+RUN gradle clean build -x test
 
-# Stage 2: Runtime with Eclipse Temurin (modern Java)
-FROM eclipse-temurin:17-jdk-slim
+
+# ===============================
+# Stage 2: Runtime (Java 17)
+# ===============================
+FROM eclipse-temurin:17-jre-jammy
+
 ARG PORT=8080
 ENV PORT=${PORT}
 
 WORKDIR /app
 
-# Copy built jar from builder
+# Copy fat jar from builder stage
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Volume for file storage
+# Volume for uploaded/static files
 VOLUME [ "/app/filestorage/images" ]
 
-# Expose port
+# Expose application port
 EXPOSE 8080
 
-# Run Spring Boot 
+# Run Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=${PORT}"]
