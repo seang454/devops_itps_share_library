@@ -11,8 +11,8 @@ COPY src ./src
 # Build the project (skip tests)
 RUN gradle build -x test
 
-# Stage 2: Runtime with an OpenJDK
-FROM openjdk:17-jdk-slim 
+# Stage 2: Runtime with Eclipse Temurin (modern Java)
+FROM eclipse-temurin:17-jdk-slim
 ARG PORT=8080
 ENV PORT=${PORT}
 
