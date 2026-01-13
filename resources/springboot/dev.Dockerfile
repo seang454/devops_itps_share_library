@@ -27,5 +27,5 @@ VOLUME [ "/app/filestorage/images" ]
 # Expose port
 EXPOSE 8080
 
-# Run Spring Boot app
+# Run Spring Boot 
 ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=${PORT}"]
